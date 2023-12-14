@@ -5,11 +5,12 @@ import requests
 import time, os
 TARGET_DAYS = 30
 target_in_seconds = TARGET_DAYS*24*60*60
+PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
+QUOTA = 140 # GB
 class JsonIt:
     def __init__(self, file_path, default = None):
         self.file_path = file_path
-        self.file_directory = os.path.dirname(self.file_path) + "\\" + os.path.basename(self.file_path).split(".")[0]
         if not os.path.isfile(self.file_path):
             if default is not None:
                 self.save_data(default)
@@ -29,7 +30,7 @@ class JsonIt:
         data = self.read_data()
         return data[key]
     
-    def __setitem__(self, key: str, value) -> None:
+    def __setitem__(self, key: str, value):
         data = self.read_data()
         data[key] = value
         self.save_data(data)
@@ -80,9 +81,11 @@ def get_params(time_value : dict):
     timestamps = [int(ts) for ts in time_value.keys()]
     usages = list(time_value.values())
     if len(timestamps)<=1:
-        return [[timestamps, usages], None, len(timestamps)]
+        return [[timestamps, usages], [0,0], None, len(timestamps)]
     
     fitter = Fitter(timestamps, usages, 1)
     zero_date = timestamp2date(-fitter.coffs[1]/fitter.coffs[0]) # the date at which it is predicted that the internet will end at
     last_prediction = fitter.coffs[0] * timestamps[-1] + fitter.coffs[1]
-    return [[timestamps, usages], last_prediction, zero_date]
+    target_slop = -min(QUOTA,usages[0])/(target_in_seconds)
+    target_intercepted = -(timestamps[0] + (target_in_seconds)) * target_slop
+    return [[timestamps, usages], [target_slop, target_intercepted], last_prediction, zero_date]

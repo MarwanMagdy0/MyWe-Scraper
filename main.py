@@ -11,7 +11,7 @@ import socket
 import pystray
 from PIL import Image
 
-QUOTA = 140 # GB
+
 
 class ServerThread(QThread):
     progress_updated = pyqtSignal(int)
@@ -36,7 +36,7 @@ class BrowserThread(QThread):
     """
     final_value = pyqtSignal(str)
     def run(self):
-        output = subprocess.check_output(['python3', '/home/marwan/Documents/Python_Projects/Qt/MyWe/get_data_script.py'], stderr=subprocess.STDOUT, universal_newlines=True)
+        output = subprocess.check_output(['python3', PATH + 'get_data_script.py'], stderr=subprocess.STDOUT, universal_newlines=True)
         output = output.split()[0]
         self.final_value.emit(output)
     
@@ -75,7 +75,7 @@ class TrayThread(QThread):
         self.ui.close()
 
     def run(self):
-        image = Image.open("/home/marwan/Documents/Python_Projects/Qt/MyWe/wifi.png")
+        image = Image.open(PATH + "wifi.png")
 
         # Create a menu item with the left-click event handler
         menu = (pystray.MenuItem("show", self.on_left_click, default = True),
@@ -97,8 +97,8 @@ class UI(QMainWindow):
     internet_list: QListWidget
     def __init__(self):
         super().__init__()
-        uic.loadUi("/home/marwan/Documents/Python_Projects/Qt/MyWe/load.ui",self)
-        self.setWindowIcon(QIcon("/home/marwan/Documents/Python_Projects/Qt/MyWe/wifi.png"))
+        uic.loadUi(PATH + "load.ui",self)
+        self.setWindowIcon(QIcon(PATH + "wifi.png"))
         self.init_ui()
         self.init_data()
         
@@ -119,20 +119,16 @@ class UI(QMainWindow):
         finish.triggered.connect(lambda : self.closeEvent(None))
 
     def init_data(self):
-        self.data_file = JsonIt("/home/marwan/Documents/Python_Projects/Qt/MyWe/data/net.json")
+        self.data_file = JsonIt(PATH + "data/net.json")
         internet_data = self.data_file.read_data()
-        [timestamps, values], last_prediction, zero_date = get_params(internet_data)
+        [timestamps, values], [target_slop, target_intercepted], last_prediction, zero_date = get_params(internet_data)
         if last_prediction is None and zero_date == 0:
             self.logg_info1.setText(f"Check The internet by clicking the button above")
             self.logg_info2.setText(f"There is no enough data to predict future")
             return
-        
-            
-        self.target_slop = -min(QUOTA,values[0])/(TARGET_DAYS * 24 * 60 *60)
-        self.target_intercepted = -(timestamps[0] + (TARGET_DAYS * 24 * 60 *60)) * self.target_slop
         self.diffrential_data = []
         for ts, value in internet_data.items():
-            target_diff = int(ts) * self.target_slop + self.target_intercepted - value
+            target_diff = int(ts) * target_slop + target_intercepted - value
             if target_diff<0:
                 self.internet_list.addItem(f"{timestamp2date(ts)}  {float(value):.2f}  {float(target_diff):.2f}")
             else:
@@ -142,15 +138,11 @@ class UI(QMainWindow):
         if last_prediction is None and zero_date == 1:
             self.logg_info2.setText(f"There is no enough data to predict future")
             return
-
-        last_row_index = self.internet_list.count() - 1
-        self.internet_list.setCurrentRow(last_row_index)
         self.logg_info1.setText(f"{timestamp2date(timestamps[-1])}\n{values[-1]} GB \nRemaining")
         self.logg_info2.setText(f"It's predicted that internet will end at\n{zero_date}")
-        self.MplWidget.axes1.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , values,color="r",marker='.')
-        self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), last_prediction],color="b")
-        self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), timestamps[-1] * self.target_slop + self.target_intercepted],color="g")
-        self.MplWidget.axes2.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , self.diffrential_data,color="g")
+        last_row_index = self.internet_list.count() - 1
+        self.internet_list.setCurrentRow(last_row_index)
+        self.plot_data(timestamps, values, last_prediction, target_slop, target_intercepted)
 
 
     def check_internet_method(self):
@@ -169,21 +161,23 @@ class UI(QMainWindow):
         self.check_internet_button.setEnabled(True)
         self.logg_info1.setText(f"{timestamp2date(time_now)}\n{internet_value} GB \nRemaining")
         data = self.data_file.read_data()
-        [timestamps, values], last_prediction, zero_date = get_params(data)
+        [timestamps, values], [target_slop, target_intercepted], last_prediction, zero_date = get_params(data)
         if last_prediction is None and zero_date == 0:
             data[f"{int(time_now)}"] = float(internet_value)
             self.data_file.save_data(data)
             self.internet_list.addItem(f"{timestamp2date(time_now)}  {float(internet_value):.2f}  +0.00")
             self.logg_info2.setText(f"There is no enough data to predict future")
             return
+        
         if abs(values[-1] - float(internet_value)) <0.1:
             return
+        
         data[f"{int(time_now)}"] = float(internet_value)
         self.data_file.save_data(data)
-        [timestamps, values], last_prediction, zero_date = get_params(data)
+        [timestamps, values], [target_slop, target_intercepted], last_prediction, zero_date = get_params(data)
         self.logg_info2.setText(f"It's predicted that internet will end at\n{zero_date}")
         self.server_thread.requestInterruption()
-        target_diff = int(timestamps[-1]) * self.target_slop + self.target_intercepted - values[-1]
+        target_diff = int(timestamps[-1]) * target_slop + target_intercepted - values[-1]
         if target_diff<0:
             self.internet_list.addItem(f"{timestamp2date(time_now)}  {float(internet_value):.2f}  {float(target_diff):.2f}")
         else:
@@ -192,11 +186,14 @@ class UI(QMainWindow):
         last_row_index = self.internet_list.count() - 1
         self.internet_list.setCurrentRow(last_row_index)
         self.diffrential_data.append(target_diff)
+        self.plot_data(timestamps, values, last_prediction, target_slop, target_intercepted)
+    
+    def plot_data(self, timestamps, values, last_prediction, target_slop, target_intercepted):
         self.MplWidget.axes1.clear()
         self.MplWidget.axes1.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , values, color="r",marker='.')
         self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), last_prediction],color="b")
-        self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), timestamps[-1] * self.target_slop + self.target_intercepted],color="g")
-        self.MplWidget.axes2.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , self.diffrential_data,color="g")
+        self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), timestamps[-1] * target_slop + target_intercepted],color="g")
+        self.MplWidget.axes2.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , self.diffrential_data,color="#17181d")
         self.MplWidget.axes1.relim()
         self.MplWidget.axes1.autoscale_view()
         self.MplWidget.axes2.relim()
@@ -216,6 +213,5 @@ class UI(QMainWindow):
 
 app = QApplication(sys.argv)
 wind = UI()
-wind.show()
 app.exec_()
 
