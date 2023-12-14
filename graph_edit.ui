@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>698</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1000</width>
+    <height>698</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1000</width>
+    <height>698</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">* {
+    font: 63 14pt &quot;JetBrains Mono NL SemiBold&quot;;
+    background-color: rgb(30, 30, 30);
+    color: rgb(224, 224, 224);
+}
+
+QTabWidget::pane {
+            border: none;
+}
+
+QTabBar {
+            background-color: #1e1e1e;
+            color: #333333;
+}
+
+QTabBar::tab {
+			color: rgb(255, 255, 255);
+            padding: 5px;
+            border-radius: 10px;
+}
+
+QTabBar::tab:selected {
+            background-color: rgb(85, 0, 255);
+}
+
+
+QPushButton {
+background-color: #03DAC6;
+border: 2px solid #1e1e1e;
+border-radius: 15px;
+color: #FFFFFF;
+}
+QPushButton:hover {
+    border-radius:20px;
+	
+	background-color: rgb(28, 77, 255);
+    color: white;
+}
+
+QPushButton:disabled {
+    background-color: gray;
+    color: white;
+}
+
+QPushButton:pressed {
+    
+	background-color: rgb(85, 0, 255);
+    color: white;
+}
+QPushButton#exit_button {
+	
+	background-color: rgb(255, 8, 86);
+}
+
+QPushButton#exit_button:pressed {
+	
+	
+	background-color: rgb(172, 0, 0);
+}
+QPushButton#exit_button:hover {
+    border-radius:20px;
+	
+	
+	background-color: rgb(185, 0, 92);
+    color: white;
+}
+
+
+QLabel {
+font: 63 16pt &quot;JetBrains Mono NL SemiBold&quot;;
+
+background-color: rgb(30, 30, 30);
+border-radius: 25px;
+
+}
+
+QListWidget {
+background-color: rgb(40, 40, 40);
+border-radius: 25px;
+}
+
+
+QScrollBar:vertical {
+        background-color: #333333;
+        width: 10px;
+    }
+    QScrollBar::handle:vertical {
+        background-color: #555555;
+        min-height: 20px;
+    }
+    QScrollBar::handle:vertical:hover {
+        background-color: #777777;
+    }
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {
+        background: none;
+    }
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
+        background: none;
+    }
+
+QLineEdit {
+background-color: rgb(40, 40, 40);
+border: 5px solid #1e1e1e;
+border-radius: 15px;
+}</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>All old usages</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="all_data_list">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="textElideMode">
+          <enum>Qt::ElideNone</enum>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>add</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>remove</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>selected data</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="all_data_list_2">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="textElideMode">
+          <enum>Qt::ElideNone</enum>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Target Days: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

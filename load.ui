@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1069</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">* {
+	background-color: #17181d;
+	color: #ffffff;
+}
+QTabWidget::pane {
+            border: none;
+}
+
+QTabBar {
+            background-color: #17181d;
+            color: #333333;
+}
+
+QTabBar::tab {
+    color: rgb(255, 255, 255);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+QTabBar::tab:selected {
+     border-radius:5px;
+	border: 1px solid #808080;
+	background-color: #808080;
+    color: 17181d;
+}
+
+QPushButton {
+	font: 63 20pt &quot;DejaVu Sans Mono&quot;;
+	background-color: #e5e5e5;
+	border: 1px solid #e5e5e5;
+	border-radius: 5px;
+	color: #17181d;
+}
+QPushButton:hover {
+    border-radius:5px;
+	border: 1px solid #a0a0a0;
+	background-color: #a0a0a0;
+    color: 17181d;
+}
+
+QPushButton:disabled {
+	border-radius:5px;
+	border: 1px solid gray;
+    background-color: gray;
+    color: 17181d;
+}
+
+QPushButton:pressed {
+    border-radius:5px;
+	border: 1px solid #808080;
+	background-color: #808080;
+    color: 17181d;
+}
+QHeaderView::section {
+ background-color: #303030;
+border:none;
+ }
+
+QScrollBar:vertical {
+        background-color: #333333;
+        width: 10px;
+    }
+    QScrollBar::handle:vertical {
+        background-color: #555555;
+        min-height: 20px;
+    }
+    QScrollBar::handle:vertical:hover {
+        background-color: #777777;
+    }
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {
+        background: none;
+    }
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
+        background: none;
+    }
+
+QProgressBar{
+    font: 63 20pt &quot;DejaVu Sans Mono&quot;;
+    background-color: #292c35;
+    border: 1px solid #292c35;
+    border-radius: 5px;
+}
+
+QLabel {
+    font: 63 20pt &quot;DejaVu Sans Mono&quot;;
+    background-color: #292c35;
+    border: 1px solid #292c35;
+    border-radius: 5px;
+}
+
+QListWidget {
+    font: 63 20pt &quot;DejaVu Sans Mono&quot;;
+    background-color: #292c35;
+    border: 1px solid #292c35;
+    border-radius: 5px;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Data preview</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QListWidget" name="internet_list">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="verticalScrollMode">
+           <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QPushButton" name="check_internet_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Check Internet</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="logg_info1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>logg info</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="logg_info2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>logg info2</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBar">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="textVisible">
+             <bool>true</bool>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>false</bool>
+            </property>
+            <property name="textDirection">
+             <enum>QProgressBar::TopToBottom</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Graph View</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="MplWidget" name="MplWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
