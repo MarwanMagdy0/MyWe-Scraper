@@ -92,8 +92,9 @@ class UI(QMainWindow):
     MplWidget: MplWidget
     check_internet_button : QPushButton
     progressBar: QProgressBar
-    logg_info1: QLabel
-    logg_info2: QLabel
+    logg_info1         : QLabel
+    logg_info2         : QLabel
+    when_to_stop_label : QLabel
     internet_list: QListWidget
     def __init__(self):
         super().__init__()
@@ -189,6 +190,8 @@ class UI(QMainWindow):
         self.plot_data(timestamps, values, last_prediction, target_slop, target_intercepted)
     
     def plot_data(self, timestamps, values, last_prediction, target_slop, target_intercepted):
+        when_to_stop_time = (values[-1] - target_intercepted) / target_slop
+        self.when_to_stop_label.setText(f"To set diff to zero:\n{timestamp2date(when_to_stop_time)}")
         self.MplWidget.axes1.clear()
         self.MplWidget.axes1.plot([datetime.fromtimestamp(int(ts)) for ts in timestamps]                         , values, color="r",marker='.')
         self.MplWidget.axes1.plot([datetime.fromtimestamp(timestamps[0]), datetime.fromtimestamp(timestamps[-1])], [min(QUOTA,values[0]), last_prediction],color="b")

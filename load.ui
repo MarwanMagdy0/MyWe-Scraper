@@ -219,6 +219,16 @@ QListWidget {
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="when_to_stop_label">
+            <property name="text">
+             <string>No enough info</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QProgressBar" name="progressBar">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

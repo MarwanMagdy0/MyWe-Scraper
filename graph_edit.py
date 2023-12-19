@@ -4,16 +4,18 @@ from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 import os
-from utiles import timestamp2date
+from utiles import *
 class GraphEdit(QDialog):
     all_data_list:      QListWidget
     selected_data_list: QListWidget
+    add_button    : QPushButton
+    remove_button : QPushButton
     def __init__(self):
         super().__init__()
-        loadUi("C:\\Users\\hp\\Documents\\My_Data\\Python Projects\\Qt\\MyWe\\graph_edit.ui", self)
+        loadUi(PATH + "graph_edit.ui", self)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setWindowTitle("Graph Edit")
-        self.setWindowIcon(QIcon(r"C:\Users\hp\Documents\My_Data\Python Projects\Qt\MyWe\wifi.png"))
+        self.setWindowIcon(QIcon(PATH + "wifi.png"))
         self.show()
         self.data = []
         self.load_old_data()
