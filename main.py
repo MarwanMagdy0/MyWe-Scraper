@@ -1,58 +1,33 @@
 #!/usr/bin/env python3
 from PyQt5.QtWidgets import QMainWindow, QApplication ,QLabel ,QPushButton, QAction, QProgressBar, QListWidget
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from PyQt5 import uic
 from mplwidget import MplWidget
 from PyQt5.QtGui import QIcon
 import sys
 from utiles import *
-import subprocess
-import socket
+from get_data_api import *
 import pystray
 from PIL import Image
-
-
-
-class ServerThread(QThread):
-    progress_updated = pyqtSignal(int)
-    def run(self):
-        self.run = True
-        # Creating The Server
-        HOST = "127.0.0.1"
-        PORT = 9090
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind((HOST, PORT))
-        server.listen(1)
-        message = 500
-        while int(message) != 100 and not self.isInterruptionRequested():
-            commu, addr = server.accept()
-            message = int(commu.recv(1024).decode("utf-8"))
-            self.progress_updated.emit(message)
-        server.close()
 
 class BrowserThread(QThread):
     """
     This class is to open the second python file and get the internet output from it
     """
-    final_value = pyqtSignal(str)
+    final_value = pyqtSignal(float)
+    no_internet = pyqtSignal()
     def run(self):
-        output = subprocess.check_output(['python3', PATH + 'get_data_script.py'], stderr=subprocess.STDOUT, universal_newlines=True)
-        output = output.split()[0]
-        self.final_value.emit(output)
-    
-class Every20MinuitThread(QThread):
-    """
-    This Thread is only used for grapping internet data evert 20 minuits
-    """
-    def init(self, ui):
-        self.ui = ui
-    def run(self):
-        while True:
-            print("timestart")
-            time.sleep(20 * 60)
-            print("timeend")
-
-            self.ui.check_internet_method()
+        if not is_connected_to_internet():
+            self.no_internet.emit()
+            return None
+        # if freeunitusage_payload.get("customerId") is None:
+        #     # freeunitusage_payload["customerId"] = get_customer_id()
+        #     print(freeunitusage_payload["customerId"])
+        token = get_jwt()
+        print(token)
+        remaining = get_user_data(token)
+        print(remaining)
+        self.final_value.emit(remaining)
 
 class TrayThread(QThread):
     """
@@ -91,7 +66,6 @@ class TrayThread(QThread):
 class UI(QMainWindow):
     MplWidget: MplWidget
     check_internet_button : QPushButton
-    progressBar: QProgressBar
     logg_info1         : QLabel
     logg_info2         : QLabel
     when_to_stop_label : QLabel
@@ -104,18 +78,17 @@ class UI(QMainWindow):
         self.init_data()
         
     def init_ui(self):
-        self.progressBar.setMaximum(100)
-        self.progressBar.setValue(0)
         self.browser_thread = BrowserThread()
-        self.server_thread  = ServerThread()
-        self.server_thread.progress_updated.connect(self.update_progressbar)
-        self.every_20_minuit_thread = Every20MinuitThread()
-        self.every_20_minuit_thread.init(self)
-        self.every_20_minuit_thread.start()
+        self.browser_thread.final_value.connect(self.update_list)
+        self.browser_thread.no_internet.connect(lambda: self.check_internet_button.setEnabled(True))
+        self.timer = QTimer()
+        self.timer.setInterval(10 * 60000)
+        self.timer.timeout.connect(self.get_user_data)
+        self.timer.start()
         self.tray_thread  = TrayThread()
         self.tray_thread.init(self)
         self.tray_thread.start()
-        self.check_internet_button.clicked.connect(self.check_internet_method)
+        self.check_internet_button.clicked.connect(self.get_user_data)
         finish = QAction("Quit", self)
         finish.triggered.connect(lambda : self.closeEvent(None))
 
@@ -146,15 +119,8 @@ class UI(QMainWindow):
         self.plot_data(timestamps, values, last_prediction, target_slop, target_intercepted)
 
 
-    def check_internet_method(self):
-        if not is_connected_to_internet():
-            return None
+    def get_user_data(self):
         self.check_internet_button.setEnabled(False)
-        self.progressBar.setValue(0)
-        self.server_thread.start()
-        self.browser_thread = BrowserThread()
-        self.browser_thread.final_value.connect(self.update_list)
-        self.browser_thread.finished.connect(self.browser_thread.deleteLater)
         self.browser_thread.start()
 
     def update_list(self, internet_value):
@@ -170,14 +136,13 @@ class UI(QMainWindow):
             self.logg_info2.setText(f"There is no enough data to predict future")
             return
         
-        if abs(values[-1] - float(internet_value)) <0.1:
+        if abs(values[-1] - float(internet_value)) <0.01:
             return
         
         data[f"{int(time_now)}"] = float(internet_value)
         self.data_file.save_data(data)
         [timestamps, values], [target_slop, target_intercepted], last_prediction, zero_date = get_params(data)
         self.logg_info2.setText(f"It's predicted that internet will end at\n{zero_date}")
-        self.server_thread.requestInterruption()
         target_diff = int(timestamps[-1]) * target_slop + target_intercepted - values[-1]
         if target_diff<0:
             self.internet_list.addItem(f"{timestamp2date(time_now)}  {float(internet_value):.2f}  {float(target_diff):.2f}")
@@ -203,8 +168,6 @@ class UI(QMainWindow):
         self.MplWidget.axes2.autoscale_view()
         self.MplWidget.canvas.draw_idle()
 
-    def update_progressbar(self, value):
-        self.progressBar.setValue(value)
     
     def closeEvent(self, event):
         self.tabWidget.setCurrentIndex(0)

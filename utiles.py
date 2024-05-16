@@ -86,6 +86,9 @@ def get_params(time_value : dict):
     fitter = Fitter(timestamps, usages, 1)
     zero_date = timestamp2date(-fitter.coffs[1]/fitter.coffs[0]) # the date at which it is predicted that the internet will end at
     last_prediction = fitter.coffs[0] * timestamps[-1] + fitter.coffs[1]
-    target_slop = -min(QUOTA,usages[0])/(target_in_seconds)
+    target_slop = -max(QUOTA,usages[0])/(target_in_seconds)
     target_intercepted = -(timestamps[0] + (target_in_seconds)) * target_slop
     return [[timestamps, usages], [target_slop, target_intercepted], last_prediction, zero_date]
+
+if __name__ == "__main__":
+    print(is_connected_to_internet())
