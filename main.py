@@ -132,6 +132,13 @@ class UI(QMainWindow):
         if abs(values[-1] - float(internet_value)) <0.01:
             return
         
+        elif abs(values[-1] - float(internet_value)) > 130:
+            # TODO: check the following is working
+            os.rename(PATH + "data/net.json", f"{timestamps[0]}-{timestamps[-1]}.json")
+            with open(PATH + "data/net.json", 'w') as f:
+                json.dump({}, f)
+            data = self.data_file.read_data()
+            
         data[f"{int(time_now)}"] = float(internet_value)
         self.data_file.save_data(data)
         [timestamps, values], [target_slop, target_intercepted], last_prediction, zero_date = get_params(data)
