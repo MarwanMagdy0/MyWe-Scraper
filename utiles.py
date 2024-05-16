@@ -9,7 +9,14 @@ PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
 QUOTA = 140 # GB
 class JsonIt:
+    """A class for handling JSON files - creating, reading, and editing."""
     def __init__(self, file_path, default = None):
+        """_summary_
+
+        Args:
+            file_path (str): The path to the JSON file. if not found it will be created
+            default (dict, optional): Default data to save if the file doesn't exist. Defaults to None.
+        """
         self.file_path = file_path
         if not os.path.isfile(self.file_path):
             if default is not None:
@@ -19,23 +26,57 @@ class JsonIt:
 
 
     def save_data(self, data):
+        """
+        Save data to the JSON file.
+
+        Args:
+            data (dict): The data to be saved.
+        """
         with open(self.file_path, 'w') as f:
             json.dump(data, f)
 
     def read_data(self):
+        """
+        Read data from the JSON file.
+
+        Returns:
+            dict: The data read from the file.
+        """
         with open(self.file_path, 'r') as f:
             return json.load(f)
         
     def __getitem__(self, key):
+        """
+        Get an item from the data using its key.
+
+        Args:
+            key (str): The key of the item to retrieve.
+
+        Returns:
+            Any: The value corresponding to the key.
+        """
         data = self.read_data()
         return data[key]
     
     def __setitem__(self, key: str, value):
+        """
+        Set a value in the data using its key.
+
+        Args:
+            key (str): The key of the item to set.
+            value (Any): The value to set for the key.
+        """
         data = self.read_data()
         data[key] = value
         self.save_data(data)
         
     def keys(self):
+        """
+        Get all keys present in the data.
+
+        Returns:
+            dict_keys: A view object providing a dynamic view of all keys.
+        """
         data = self.read_data()
         return data.keys()
     

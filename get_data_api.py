@@ -34,6 +34,12 @@ token_payload = {
 }
 
 def get_jwt():
+    """Obtains the JSON Web Token (JWT) from the MyWe site.
+
+    Returns:
+        str or None: The JWT token used in the process of requesting user data.
+            Returns None if there is an issue obtaining the token.
+    """
     jwt_token = None
     token_response = requests.post(login_url, headers=token_headers, json=token_payload)
     if token_response.status_code == 200:
@@ -66,6 +72,15 @@ freeunitusage_headers = {
 }
 
 def get_user_data(jwt):
+    """Retrieves the remaining internet data balance for a user account.
+
+    Args:
+        jwt (str): The JSON Web Token (JWT) used for authentication, obtained from the `get_jwt()` function.
+
+    Returns:
+        int or None: The remaining amount of internet data in gigabytes (GB) for the user account.
+            Returns None if there is an issue retrieving the data or if the data is unavailable.
+    """
     freeunitusage_headers["Jwt"] = jwt
     freeunitusage_response = requests.post(freeunitusage_url, headers=freeunitusage_headers, json=freeunitusage_payload)
     if freeunitusage_response.json()["body"] is None:
