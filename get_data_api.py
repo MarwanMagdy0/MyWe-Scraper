@@ -1,5 +1,11 @@
 import requests
 import time
+import json
+
+with open("user_data.json", "r") as file:
+    user_data = json.load(file)
+    print(user_data)
+
 base_url = "https://api-my.te.eg"
 login_url = f"{base_url}/api/user/login"
 freeunitusage_url = f"{base_url}/api/line/freeunitusage"
@@ -23,13 +29,13 @@ token_headers = {
 }
 token_payload = {
     "header": {
-        "msisdn": "034341409",
+        "msisdn": user_data["msisdn"],
         "numberServiceType": "FBB",
         "timestamp": str(int(time.time())),
         "locale": "en"
     },
     "body": {
-        "password": "MlRP8zekObQDPvpsV32VtA=="
+        "password": user_data["password"]
     }
 }
 
@@ -49,7 +55,7 @@ def get_jwt():
 
 freeunitusage_payload = {
     "header": {
-        "msisdn": "034341409",
+        "msisdn": user_data["msisdn"],
         "numberServiceType": "FBB",
         "locale": "en"
     }

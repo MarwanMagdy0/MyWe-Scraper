@@ -10,19 +10,14 @@ from get_data_api import *
 import pystray
 from PIL import Image
 
-class BrowserThread(QThread):
-    """
-    This class is to open the second python file and get the internet output from it
-    """
+class ApiCallingThread(QThread):
+    """This class is responsible for calling the api with the user data and get the remaining GB from mywe site"""
     final_value = pyqtSignal(float)
     no_internet = pyqtSignal()
     def run(self):
         if not is_connected_to_internet():
             self.no_internet.emit()
             return None
-        # if freeunitusage_payload.get("customerId") is None:
-        #     # freeunitusage_payload["customerId"] = get_customer_id()
-        #     print(freeunitusage_payload["customerId"])
         token = get_jwt()
         print(token)
         remaining = get_user_data(token)
@@ -30,9 +25,7 @@ class BrowserThread(QThread):
         self.final_value.emit(remaining)
 
 class TrayThread(QThread):
-    """
-    This class is to open the second python file and get the internet output from it
-    """
+    """This class is only for handeling the thread of the tray"""
     def init(self, ui):
         self.ui = ui
 
@@ -78,9 +71,9 @@ class UI(QMainWindow):
         self.init_data()
         
     def init_ui(self):
-        self.browser_thread = BrowserThread()
-        self.browser_thread.final_value.connect(self.update_list)
-        self.browser_thread.no_internet.connect(lambda: self.check_internet_button.setEnabled(True))
+        self.api_calling_thread = ApiCallingThread()
+        self.api_calling_thread.final_value.connect(self.update_list)
+        self.api_calling_thread.no_internet.connect(lambda: self.check_internet_button.setEnabled(True))
         self.timer = QTimer()
         self.timer.setInterval(10 * 60000)
         self.timer.timeout.connect(self.get_user_data)
@@ -121,7 +114,7 @@ class UI(QMainWindow):
 
     def get_user_data(self):
         self.check_internet_button.setEnabled(False)
-        self.browser_thread.start()
+        self.api_calling_thread.start()
 
     def update_list(self, internet_value):
         time_now = time.time()
