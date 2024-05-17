@@ -18,9 +18,7 @@ class ApiCallingThread(QThread):
         if not is_connected_to_internet():
             self.no_internet.emit()
             return None
-        token = get_jwt()
-        print(token)
-        remaining = get_user_data(token)
+        remaining = get_user_data()
         print(remaining)
         self.final_value.emit(remaining)
 

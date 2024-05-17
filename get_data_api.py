@@ -1,97 +1,104 @@
 import requests
 import time
 import json
+import os
+PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
-with open("user_data.json", "r") as file:
+with open(PATH + "user_data.json", "r") as file:
     user_data = json.load(file)
+    user_data["msisdn"] = int(user_data["msisdn"])
     print(user_data)
+tokens_url = "https://my.te.eg/echannel/service/besapp/base/rest/busiservice/v1/auth/userAuthenticate"
 
-base_url = "https://api-my.te.eg"
-login_url = f"{base_url}/api/user/login"
-freeunitusage_url = f"{base_url}/api/line/freeunitusage"
-
-# Define the headers
-token_headers = {
-    "Host": "api-my.te.eg",
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+tokens_headers = {
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Jwt": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJ0ZS5jb20iLCJleHAiOjI2NjEwOTE3MTQsImp0aSI6Ik5ibUFWd3NHQzZKUjVGamcyeHZzWXciLCJpYXQiOjE3MTUwMTE3MTQsIm5iZiI6MTcxNTAxMTU5NCwic3ViIjoiQW5vbnltb3VzIiwicm9sZXMiOlsiUk9MRV9BTk9OWU1PVVMiXSwiSVAiOiIxNTYuMTkyLjIzOS42MywgMTAuMTYuMTQ2LjU2LCAxMC4xOS4yNDcuMjQwIiwiY2hhbm5lbElkIjoiV0VCX0FQUCJ9.ONM_vFHVcxn07AvmreT8IBxrudzrMfj7tjhy3I2s7NBOhVLWJ6sBgNKThWZZynRqm_j0d4z-XRJzShbPzvzV5m7BTKIuRueeY7lRdgyaka5C3mxtWyWLWwwdBj7bl5_1ryJeXFbFYWU0_J7vAy_pIg21KxQ1LeedvzTB18haHBgx-nxBdudqvzxP81DIf-VXyQ4SGxbPUeyVeOhMG9XWSdoo3DLrmxZOEnMW-XOiCHJdJa4Y9ZsvmszPrY8DyamNU9mN-IN_mspuei6Q-_4kFWBG-NTFL_1_K2rSABEJHOdjwaL12IQnHKMN_lcJECzXI3HPLrTEb_ZabiVB862aYw",
-    "Content-Type": "application/json",
-    "Content-Length": "105",
-    "Origin": "https://my.te.eg",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9,ar-EG;q=0.8,ar;q=0.7",
     "Connection": "keep-alive",
-    "Referer": "https://my.te.eg/",
+    "Content-Length": "120",
+    "Content-Type": "application/json",
+    "Host": "my.te.eg",
+    "Origin": "https://my.te.eg",
+    "Referer": "https://my.te.eg/echannel/",
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site"
-}
-token_payload = {
-    "header": {
-        "msisdn": user_data["msisdn"],
-        "numberServiceType": "FBB",
-        "timestamp": str(int(time.time())),
-        "locale": "en"
-    },
-    "body": {
-        "password": user_data["password"]
-    }
-}
-
-def get_jwt():
-    """Obtains the JSON Web Token (JWT) from the MyWe site.
-
-    Returns:
-        str or None: The JWT token used in the process of requesting user data.
-            Returns None if there is an issue obtaining the token.
-    """
-    jwt_token = None
-    token_response = requests.post(login_url, headers=token_headers, json=token_payload)
-    if token_response.status_code == 200:
-        token_body = token_response.json()["body"]
-        jwt_token =  token_body["jwt"]
-    return jwt_token
-
-freeunitusage_payload = {
-    "header": {
-        "msisdn": user_data["msisdn"],
-        "numberServiceType": "FBB",
-        "locale": "en"
-    }
+    "Sec-Fetch-Site": "same-origin",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "channelId": "702",
+    "csrftoken": "",
+    "delegatorSubsId": "",
+    "isCoporate": "false",
+    "isMobile": "false",
+    "isSelfcare": "true",
+    "languageCode": "en-US",
+    "sec-ch-ua": "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Linux\""
 }
 
-freeunitusage_headers = {
-    "Host": "api-my.te.eg",
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+tokens_payload = {
+    "acctId": f"FBB{user_data['msisdn']}",
+    "password": user_data["password"],
+    "appLocale": "en-US",
+    "isSelfcare": "Y",
+    "isMobile": "N",
+    "recaptchaToken": "",
+}
+
+def get_request_params():
+    response = requests.post(tokens_url, headers=tokens_headers, json=tokens_payload)
+    data = response.json()
+    # print(json.dumps(data, indent=4))
+    if data["body"] is not None:
+        csrftoken = data["body"]["token"]
+        indiv_login_token = data["body"]["utoken"]
+        subscriber_id = data["body"]["subscriber"]["subscriberId"]
+        return csrftoken, indiv_login_token, subscriber_id
+    return None, None, None
+
+
+data_url = "https://my.te.eg/echannel/service/besapp/base/rest/busiservice/cz/cbs/bb/queryFreeUnit"
+request_headers = {
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Content-Type": "application/json",
-    "Content-Length": "105",
-    "Origin": "https://my.te.eg",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9,ar-EG;q=0.8,ar;q=0.7",
+    "Channelid": "702",
     "Connection": "keep-alive",
-    "Referer": "https://my.te.eg/",
+    "Content-Length": "27",
+    "Content-Type": "application/json",
+    "Delegatorsubsid": "",
+    "Host": "my.te.eg",
+    "Iscoporate": "false",
+    "Ismobile": "false",
+    "Isselfcare": "true",
+    "Languagecode": "en-US",
+    "Origin": "https://my.te.eg",
+    "Referer": "https://my.te.eg/echannel/",
+    "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"Linux"',
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site"
+    "Sec-Fetch-Site": "same-origin",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
 }
 
-def get_user_data(jwt):
-    """Retrieves the remaining internet data balance for a user account.
+generate_request_coockies = lambda indiv_login_token:f"_ga=GA1.3.939407918.1692936222; _tt_enable_cookie=1; _ttp=rX1m-nGXsuVxGYk59Bwv5d7jDU4; _ga=GA1.1.939407918.1692936222; _gcl_au=1.1.383667643.1715546338; _fbp=fb.1.1715546338174.1288707767; _ga_233C94050H=GS1.1.1715583508.5.0.1715583508.60.0.0; _ga_P78FD21ZQ7=GS1.3.1715583508.2.0.1715583508.60.0.0; route=9f505a74cf9b5ad798559070a0d61dde; indiv_login_token={indiv_login_token}; TS01fa9144=010aa23b1df9276a16f0e633e20fbcd95dad200d2939a1020a02098e708a3624d2379b5e49fc16c0576549b5be40b90e6501ccd5964134cb31f9e502029542be298f38eefe7f816a996021e6ed28300de49315f0c7; TS01bba117=010aa23b1db65fdc8c8e5a289be8cd79dc05d5354539a1020a02098e708a3624d2379b5e49fc16c0576549b5be40b90e6501ccd59684ad7bf49d32d2925cd4f0d5351a24d80a6ef9779035dcaaa867c1f4f0ece5e15d666f0ef0888618ef20ed97ff6e237d; dtCookie=v_4_srv_52_sn_6BA6CE10D56CDBECEFEC0076C71CECB0_perc_100000_ol_0_mul_1_app-3A6032d7aeebe38554_1"
 
-    Args:
-        jwt (str): The JSON Web Token (JWT) used for authentication, obtained from the `get_jwt()` function.
+def get_user_data():
+    csrftoken, indiv_login_token, subscriber_id = get_request_params()
+    request_payload = {"subscriberId": subscriber_id}
+    request_headers["Csrftoken"] = csrftoken
+    request_headers["Cookie"] = generate_request_coockies(indiv_login_token)
+    response = requests.post(data_url, headers=request_headers, json=request_payload)
+    data = response.json()
+    if data["body"] is not None:
+        # print(json.dumps(data, indent=4))
+        remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
+        print(remaining)
+        return remaining
 
-    Returns:
-        int or None: The remaining amount of internet data in gigabytes (GB) for the user account.
-            Returns None if there is an issue retrieving the data or if the data is unavailable.
-    """
-    freeunitusage_headers["Jwt"] = jwt
-    freeunitusage_response = requests.post(freeunitusage_url, headers=freeunitusage_headers, json=freeunitusage_payload)
-    if freeunitusage_response.json()["body"] is None:
-        return 
-    return freeunitusage_response.json()["body"]["detailedLineUsageList"][0]["freeAmount"]
+
 
 if __name__ == "__main__":
-    print(get_user_data(get_jwt()))
+    get_user_data()
