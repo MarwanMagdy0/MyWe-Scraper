@@ -25,8 +25,6 @@ Here are some screenshots of MyWe-Scraper in action:
 2. *Data Plot*:
    ![alt text](screen_shots/plots.png)
 
-Feel free to add more screenshots as needed to showcase different aspects of your program.
-
 
 ## Requirements
 
