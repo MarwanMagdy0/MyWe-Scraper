@@ -88,9 +88,9 @@ generate_request_coockies = lambda indiv_login_token:f"_ga=GA1.3.939407918.16929
 
 def get_user_data():
     csrftoken, indiv_login_token, subscriber_id = get_request_params()
-    logging.info("csrftoken", csrftoken)
-    logging.info("indiv_login_token", indiv_login_token)
-    logging.info("subscriber_id", subscriber_id)
+    logging.info(f"csrftoken: {csrftoken}")
+    logging.info(f"indiv_login_token: {indiv_login_token}")
+    logging.info(f"subscriber_id: {subscriber_id}")
     request_payload = {"subscriberId": subscriber_id}
     request_headers["Csrftoken"] = csrftoken
     request_headers["Cookie"] = generate_request_coockies(indiv_login_token)
@@ -99,7 +99,7 @@ def get_user_data():
     if data["body"] is not None:
         # print(json.dumps(data, indent=4))
         remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
-        logging.info("remaining", remaining)
+        logging.info(f"remaining: {remaining}")
         return remaining
 
 
