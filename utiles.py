@@ -1,8 +1,11 @@
-import json
-import numpy as np
 from datetime import datetime
+import numpy as np
+import traceback
 import requests
 import time, os
+import logging
+import json
+import sys
 TARGET_DAYS = 30
 target_in_seconds = TARGET_DAYS*24*60*60
 PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
@@ -130,6 +133,38 @@ def get_params(time_value : dict):
     target_slop = -max(QUOTA,usages[0])/(target_in_seconds)
     target_intercepted = -(timestamps[0] + (target_in_seconds)) * target_slop
     return [[timestamps, usages], [target_slop, target_intercepted], last_prediction, zero_date]
+
+class Logger:
+    @staticmethod
+    def logIntoFile(file_name):
+        # Create the root logger and set its level to DEBUG
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        
+        # Create a file handler and set its level to INFO
+        file_handler = logging.FileHandler(file_name)
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        
+        # Create a console handler and set its level to INFO
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        
+        # Add handlers to the logger
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
+        
+        # Set custom exception hook to handle uncaught exceptions
+        sys.excepthook = Logger.handle_exception
+
+    @staticmethod
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        # Log unhandled exceptions with traceback
+        logging.error(f'Unhandled exception: {exc_type.__name__}: {exc_value}')
+        logging.error("".join(traceback.format_tb(exc_traceback)))
+
+Logger.logIntoFile(PATH + "logg.log")
 
 if __name__ == "__main__":
     print(is_connected_to_internet())
