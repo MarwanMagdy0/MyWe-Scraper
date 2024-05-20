@@ -19,8 +19,10 @@ class ApiCallingThread(QThread):
             self.no_internet.emit()
             return None
         remaining = get_user_data()
-        print(remaining)
-        self.final_value.emit(remaining)
+        if remaining is None:
+            self.no_internet.emit() # error in the connection
+        else:
+            self.final_value.emit(remaining)
 
 class TrayThread(QThread):
     """This class is only for handeling the thread of the tray"""
@@ -131,8 +133,7 @@ class UI(QMainWindow):
             return
         
         elif abs(values[-1] - float(internet_value)) > 130:
-            # TODO: check the following is working
-            os.rename(PATH + "data/net.json", f"{timestamps[0]}-{timestamps[-1]}.json")
+            os.rename(PATH + "data/net.json", PATH + f"data/{timestamps[0]}-{timestamps[-1]}.json")
             with open(PATH + "data/net.json", 'w') as f:
                 json.dump({}, f)
             data = self.data_file.read_data()

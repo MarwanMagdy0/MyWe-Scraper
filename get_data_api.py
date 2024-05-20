@@ -94,13 +94,16 @@ def get_user_data():
     request_payload = {"subscriberId": subscriber_id}
     request_headers["Csrftoken"] = csrftoken
     request_headers["Cookie"] = generate_request_coockies(indiv_login_token)
-    response = requests.post(data_url, headers=request_headers, json=request_payload)
-    data = response.json()
-    if data["body"] is not None:
-        # print(json.dumps(data, indent=4))
-        remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
-        logging.info(f"remaining: {remaining}")
-        return remaining
+    try:
+        response = requests.post(data_url, headers=request_headers, json=request_payload)
+        data = response.json()
+        if data["body"] is not None:
+            # print(json.dumps(data, indent=4))
+            remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
+            logging.info(f"remaining: {remaining}")
+            return remaining
+    except:
+        return None
 
 
 
