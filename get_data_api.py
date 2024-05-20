@@ -50,7 +50,7 @@ def get_request_params():
     response = requests.post(tokens_url, headers=tokens_headers, json=tokens_payload)
     data = response.json()
     # print(json.dumps(data, indent=4))
-    if data["body"] is not None:
+    if data.get("body") is not None:
         csrftoken = data["body"]["token"]
         indiv_login_token = data["body"]["utoken"]
         subscriber_id = data["body"]["subscriber"]["subscriberId"]
