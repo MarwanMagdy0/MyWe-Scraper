@@ -18,6 +18,7 @@ class ApiCallingThread(QThread):
         timer = QTimer()
         timer.setInterval(60 * 1000)
         timer.timeout.connect(self.no_internet.emit)
+        timer.start()
         if not is_connected_to_internet():
             self.no_internet.emit()
             timer.stop()
