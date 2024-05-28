@@ -15,13 +15,19 @@ class ApiCallingThread(QThread):
     final_value = pyqtSignal(float)
     no_internet = pyqtSignal()
     def run(self):
+        timer = QTimer()
+        timer.setInterval(60 * 1000)
+        timer.timeout.connect(self.no_internet.emit)
         if not is_connected_to_internet():
             self.no_internet.emit()
+            timer.stop()
             return None
         remaining = get_user_data()
         if remaining is None:
+            timer.stop()
             self.no_internet.emit() # error in the connection
         else:
+            timer.stop()
             self.final_value.emit(remaining)
 
 class TrayThread(QThread):
