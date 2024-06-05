@@ -125,6 +125,12 @@ class UI(QMainWindow):
     def get_user_data(self):
         self.button_timeout.start()
         self.check_internet_button.setEnabled(False)
+        if self.api_calling_thread.isRunning():
+            logging.info("[ApiCallingThread] is still working.. reactreating a new one")
+            self.api_calling_thread = ApiCallingThread()
+            self.api_calling_thread.final_value.connect(self.update_list)
+            self.api_calling_thread.no_internet.connect(lambda: self.check_internet_button.setEnabled(True))
+
         self.api_calling_thread.start()
 
     def update_list(self, internet_value):

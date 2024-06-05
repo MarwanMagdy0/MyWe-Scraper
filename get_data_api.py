@@ -47,6 +47,7 @@ tokens_payload = {
 }
 
 def get_request_params():
+    logging.info("[API] Requesting tokens")
     response = requests.post(tokens_url, headers=tokens_headers, json=tokens_payload)
     data = response.json()
     # print(json.dumps(data, indent=4))
