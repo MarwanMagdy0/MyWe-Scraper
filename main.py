@@ -15,21 +15,17 @@ class ApiCallingThread(QThread):
     final_value = pyqtSignal(float)
     no_internet = pyqtSignal()
     def run(self):
-        timer = QTimer()
-        timer.setInterval(60 * 1000)
-        timer.timeout.connect(self.no_internet.emit)
-        timer.start()
+        logging.info("[ApiCallingThread] Starts")
         if not is_connected_to_internet():
+            logging.info("No internet connection")
             self.no_internet.emit()
-            timer.stop()
             return None
         remaining = get_user_data()
         if remaining is None:
-            timer.stop()
             self.no_internet.emit() # error in the connection
         else:
-            timer.stop()
             self.final_value.emit(remaining)
+            self.no_internet.emit()
 
 class TrayThread(QThread):
     """This class is only for handeling the thread of the tray"""
@@ -81,13 +77,20 @@ class UI(QMainWindow):
         self.api_calling_thread = ApiCallingThread()
         self.api_calling_thread.final_value.connect(self.update_list)
         self.api_calling_thread.no_internet.connect(lambda: self.check_internet_button.setEnabled(True))
+
         self.timer = QTimer()
         self.timer.setInterval(10 * 60000)
         self.timer.timeout.connect(self.get_user_data)
         self.timer.start()
+
+        self.button_timeout = QTimer()
+        self.button_timeout.setInterval(30 * 1000)
+        self.button_timeout.timeout.connect(lambda: [self.check_internet_button.setEnabled(True), self.button_timeout.stop()])
+        
         self.tray_thread  = TrayThread()
         self.tray_thread.init(self)
         self.tray_thread.start()
+
         self.check_internet_button.clicked.connect(self.get_user_data)
         finish = QAction("Quit", self)
         finish.triggered.connect(lambda : self.closeEvent(None))
@@ -120,6 +123,7 @@ class UI(QMainWindow):
 
 
     def get_user_data(self):
+        self.button_timeout.start()
         self.check_internet_button.setEnabled(False)
         self.api_calling_thread.start()
 
