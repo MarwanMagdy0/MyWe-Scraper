@@ -149,7 +149,7 @@ class UI(QMainWindow):
         if abs(values[-1] - float(internet_value)) <0.01:
             return
         
-        elif abs(values[-1] - float(internet_value)) > 130:
+        elif abs(values[-1] - float(internet_value)) > 50:
             os.rename(PATH + "data/net.json", PATH + f"data/{timestamps[0]}-{timestamps[-1]}.json")
             with open(PATH + "data/net.json", 'w') as f:
                 json.dump({}, f)

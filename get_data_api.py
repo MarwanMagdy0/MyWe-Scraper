@@ -100,7 +100,10 @@ def get_user_data():
         data = response.json()
         if data["body"] is not None:
             # print(json.dumps(data, indent=4))
-            remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
+            remaining = 0
+            for item in data["body"][0]["freeUnitBeanDetailList"]:
+                remaining += item["currentAmount"]
+            # remaining = data["body"][0]["freeUnitBeanDetailList"][0]["currentAmount"]
             logging.info(f"remaining: {remaining}")
             return remaining
     except:
