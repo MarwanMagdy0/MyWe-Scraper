@@ -10,7 +10,7 @@ TARGET_DAYS = 30
 target_in_seconds = TARGET_DAYS*24*60*60
 PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
-QUOTA = 140 # GB
+QUOTA = 100 # GB
 class JsonIt:
     """A class for handling JSON files - creating, reading, and editing."""
     def __init__(self, file_path, default = None):

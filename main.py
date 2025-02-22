@@ -15,17 +15,20 @@ class ApiCallingThread(QThread):
     final_value = pyqtSignal(float)
     no_internet = pyqtSignal()
     def run(self):
+        global QUOTA
         logging.info("[ApiCallingThread] Starts")
         if not is_connected_to_internet():
             logging.info("No internet connection")
             self.no_internet.emit()
             return None
-        remaining = get_user_data()
+        remaining, _ = get_user_data()
+
         if remaining is None:
             self.no_internet.emit() # error in the connection
         else:
             self.final_value.emit(remaining)
             self.no_internet.emit()
+        
 
 class TrayThread(QThread):
     """This class is only for handeling the thread of the tray"""
